@@ -12,9 +12,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(60), nullable=False)
 
-    tasks: Mapped[list["Task"]] = relationship(
-        "Task", back_populates="user", cascade="all, delete-orphan"
-    )
+    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="user", cascade="all, delete-orphan")
 
     def get_Tasks_user(self):
         return {"tasks": [t.serialize() for t in self.tasks] if self.tasks else None}

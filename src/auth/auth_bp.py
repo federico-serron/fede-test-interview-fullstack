@@ -1,13 +1,15 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
+from datetime import timedelta
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
+from api.blacklist import BLACKLIST
 
 
 bcrypt = Bcrypt()
-jwt = JWTManager()
+
 
 
 auth_bp = Blueprint("auth", __name__)
@@ -16,30 +18,20 @@ auth_bp = Blueprint("auth", __name__)
 CORS(auth_bp)
 
 
-@auth_bp.route("/hello", methods=["POST", "GET"])
-def handle_hello():
-
-    response_body = {
-        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
-    }
-
-    return jsonify(response_body), 200
-
-
-@auth_bp.route("register", methods=["POST"])
+@auth_bp.route("/register", methods=["POST"])
 def register():
     username = request.json.get("username")
     email = request.json.get("email")
     password = request.json.get("password")
 
     if not username or not email or not password:
-        return jsonify({"msg": "All the fields are required"}), 400
+        return jsonify({"error": "All the fields are required"}), 400
 
     try:
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             return (
-                jsonify({"msg": "Email already in use, please try a different one"}),
+                jsonify({"error": "Email already in use, please try a different one"}),
                 400,
             )
 
@@ -51,4 +43,45 @@ def register():
 
         return jsonify(new_user.serialize()), 201
     except Exception as e:
-        return jsonify({"msg": "Your request couldn't be completed"}), 500
+        return jsonify({"error": "Your request couldn't be completed"}), 500
+
+
+@auth_bp.route("/login", methods=["POST"])
+def login():
+    email = request.json.get("email")
+    password = request.json.get("password")
+
+    if not email or not password:
+        return jsonify({"error": "All the fields are required"}), 400
+
+    try:
+
+        login_user = User.query.filter_by(email=email).first()
+        if not login_user:
+            return jsonify({"error": "User not found"}), 404
+
+        password_from_db = login_user.password
+        password_is_correct = bcrypt.check_password_hash(password_from_db, password)
+
+        if password_is_correct:
+            expires = timedelta(minutes=30)
+
+            user_id = login_user.id
+            access_token = create_access_token(identity=str(user_id), expires_delta=expires)
+
+            return jsonify({"token": access_token, "user": login_user.serialize()}), 200
+
+        else:
+            return jsonify({"error": "User and/or password incorrect"}), 401
+
+    except Exception as e:
+        return jsonify(str(e)), 500
+    
+    
+
+@auth_bp.route("/logout", methods=["POST"])
+@jwt_required()
+def logout():
+    jti = get_jwt()["jti"]
+    BLACKLIST.add(jti)
+    return jsonify({"msg": "Logeed out successfully"}), 200
