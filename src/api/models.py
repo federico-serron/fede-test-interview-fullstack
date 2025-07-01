@@ -1,19 +1,41 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import String, Boolean, ForeignKey, DateTime, Integer, Float
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 db = SQLAlchemy()
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
 
-    def __repr__(self):
-        return f'<User {self.email}>'
+class User(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(60), nullable=False)
+    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(60), nullable=False)
+
+    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="user", cascade="all, delete-orphan")
+
+    def get_Tasks_user(self):
+        return {"tasks": [t.serialize() for t in self.tasks] if self.tasks else None}
 
     def serialize(self):
         return {
             "id": self.id,
+            "username": self.username,
             "email": self.email,
-            # do not serialize the password, its a security breach
+        }
+
+
+class Task(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    label: Mapped[str] = mapped_column(String(120), nullable=False)
+    completed: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=False)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    user: Mapped["User"] = relationship("User", back_populates="tasks")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "label": self.label,
+            "completed": self.completed,
         }
