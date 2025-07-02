@@ -31,7 +31,7 @@ const Signup = () => {
         const resp = await actions.register(userName, email, password)
 
         if (resp) {
-            toast.success("Successfully registered")
+            toast.success(store.message)
             navigate('/auth/login')
         } else {
             toast.error(store.message)

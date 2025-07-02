@@ -26,19 +26,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			register: async (userName, email, password) => {
+			register: async (username, email, password) => {
 				const URLregister = `${apiUrl}/auth/register`;
 				const store = getStore();
 
-				if (!userName || !email || !password) {
-					setStore({ ...store, message: "Todos los campos son obligatorios" })
+				if (!username || !email || !password) {
+					setStore({ ...store, message: "All fields are required" })
 					return false
 				}
 
 				try {
 
 					const userData = {
-						username: userName,
+						username: username,
 						email: email,
 						password: password
 					}
@@ -50,13 +50,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Content-type": "application/json; charset=UTF-8"
 						}
 					})
+
 					const data = await response.json()
 
 					if (!response.ok) {
 						throw new Error(data.error);
-
 					}
 
+					setStore({ ...store, message: "Welcome aboard!" })
 					return true;
 
 				} catch (error) {
@@ -70,7 +71,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const store = getStore();
 
 				if (!email || !password) {
-					setStore({ ...store, message: "Email y Password son necesarios" })
+					setStore({ ...store, message: "All fields are required" })
 					return false
 				}
 
@@ -88,12 +89,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Content-type": "application/json; charset=UTF-8"
 						}
 					})
+					const data = await response.json()
 
 					if (!response.ok) {
-						throw new Error("Error al iniciar sesion");
+						throw new Error(data.error);
 					}
-
-					const data = await response.json()
 
 					if (!data.token) {
 						throw new Error(data.error);
@@ -130,8 +130,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 						}
 					})
 
+					const data = await response.json()
+
 					if (!response.ok) {
-						throw new Error("Error trying to logout");
+						throw new Error(data.error);
 					}
 
 					localStorage.removeItem("token")
@@ -145,6 +147,155 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			addTask: async (label) => {
+				const URLtask = `${apiUrl}/tasks`;
+				const store = getStore();
+
+				if (!label) {
+					setStore({ ...store, message: "A label is required" })
+					return false
+				}
+
+				try {
+
+					const taskData = { label: label }
+
+					const response = await fetch(URLtask, {
+						method: "POST",
+						body: JSON.stringify(taskData),
+						headers: {
+							"Authorization": `Bearer ${localStorage.getItem('token')}`,
+							"Content-type": "application/json; charset=UTF-8"
+						}
+					})
+					const data = await response.json()
+
+					if (!response.ok) {
+						throw new Error(data.error);
+					}
+
+
+					setStore({ ...store, tasks: [...store.tasks, data.task] })
+
+					return true;
+
+				} catch (error) {
+					setStore({ ...store, message: error.message })
+					return false;
+				}
+			},
+
+			getTasks: async () => {
+				const URLtask = `${apiUrl}/tasks`;
+				const store = getStore();
+
+				try {
+
+					const response = await fetch(URLtask, {
+						method: "GET",
+						headers: {
+							"Authorization": `Bearer ${localStorage.getItem('token')}`,
+							"Content-type": "application/json; charset=UTF-8"
+						}
+					})
+					const data = await response.json()
+
+					if (!response.ok) {
+						throw new Error(data.error);
+					}
+
+					setStore({ ...store, tasks: data.task })
+
+					return true;
+
+				} catch (error) {
+					setStore({ ...store, message: error.message })
+					return false;
+				}
+			},
+
+			updateTask: async (task_id, label, completed) => {
+				const URLtask = `${apiUrl}/tasks/${task_id}`;
+				const store = getStore();
+
+				if (!task_id && !label || !completed) {
+					setStore({ ...store, message: "Missing data" })
+					return false
+				}
+
+				try {
+
+					const editTaskData = {}
+					if (label !== undefined) editTaskData.label = label;
+					if (completed !== undefined) editTaskData.completed = completed;
+
+					const response = await fetch(URLtask, {
+						method: "PUT",
+						body: JSON.stringify(editTaskData),
+						headers: {
+							"Authorization": `Bearer ${localStorage.getItem('token')}`,
+							"Content-type": "application/json; charset=UTF-8"
+						}
+					})
+
+					const data = await response.json()
+
+					if (!response.ok) {
+						throw new Error(data.error);
+					}
+
+					setStore({
+						...store, tasks: store.tasks.map((t) => {
+							t.id === task_id ? data.task : t
+						})
+					})
+
+					return true;
+
+				} catch (error) {
+					setStore({ ...store, message: error.message })
+					return false;
+				}
+			},
+
+			deleteTask: async (task_id) => {
+				const URLtask = `${apiUrl}/tasks/${task_id}`;
+				const store = getStore();
+
+				if (!task_id) {
+					setStore({ ...store, message: "Please select the task to delete" })
+					return false
+				}
+
+				try {
+
+					const response = await fetch(URLtask, {
+						method: "DELETE",
+						headers: {
+							"Authorization": `Bearer ${localStorage.getItem('token')}`,
+							"Content-type": "application/json; charset=UTF-8"
+						}
+					})
+
+					const data = await response.json()
+
+					if (!response.ok) {
+						throw new Error(data.error);
+					}
+
+					setStore({
+						...store, tasks: store.tasks.filter((t) => {
+							t.id !== task_id
+						})
+					})
+
+					return true;
+
+				} catch (error) {
+					setStore({ ...store, message: error.message })
+					return false;
+				}
+			},
 
 
 		}

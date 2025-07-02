@@ -16,6 +16,7 @@ export const Navbar = () => {
 			setIsLoggedIn(false)
 			toast.success("Logged out successfully")
 			navigate('/')
+			return
 
 		} else {
 			toast.error(store.message)
