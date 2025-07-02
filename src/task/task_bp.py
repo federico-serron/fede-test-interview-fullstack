@@ -21,7 +21,7 @@ CORS(task_bp)
 def get_tasks():
     
     user_id = get_jwt_identity()
-    if not user_id:
+    if user_id is None:
         return jsonify({"error": "User not found"}), 404
     
     try:
@@ -40,7 +40,7 @@ def add_task():
     user_id = get_jwt_identity()
     label = request.json.get('label')
     
-    if not label or not user_id:
+    if label is None or user_id is None:
         return jsonify({"error": "All fields are mandatory"}), 400
     
     try:
@@ -56,6 +56,7 @@ def add_task():
         return jsonify({"error": "Your request couldn't be completed"}), 500
 
 
+
 @task_bp.route('/<int:task_id>', methods=['PUT'])
 @jwt_required()
 def update_task(task_id):
@@ -64,18 +65,18 @@ def update_task(task_id):
     label = request.json.get('label')
     completed = request.json.get('completed')
     
-    if not label and completed != 'true' or completed != 'false':
+    if label is None and completed is None:
         return jsonify({"error": "Missing required data"}), 400
     
     try:
         task = Task.query.filter_by(user_id=user_id, id=task_id).first()
         
-        if not task:
+        if task is None:
             return jsonify({"error": "Task not found"}), 404
         
-        if label:
+        if label is not None:
             task.label = label
-        if completed:
+        if completed is not None:
             task.completed = completed
             
         db.session.commit()            
@@ -88,5 +89,23 @@ def update_task(task_id):
     
     
 @task_bp.route('/<int:task_id>', methods=['DELETE'])
-def delte_task(task_id):
-    return jsonify({"msg": "Mensaje"}), 200
+@jwt_required()
+def delete_task(task_id):
+    
+    user_id = get_jwt_identity()
+    if user_id is None:
+        return jsonify({"error": "User not found"}), 404        
+    
+    try:
+        task = Task.query.filter_by(user_id=user_id, id=task_id).first()
+        
+        if task is None:
+            return jsonify({"error": "Task not found"}), 404
+        
+        db.session.delete(task)
+        db.session.commit()
+        
+        return jsonify({"msg": "Task succesfully deleted"}), 200
+        
+    except Exception as e:
+        return jsonify({"error": "Your request couldn't be completed"}), 500
