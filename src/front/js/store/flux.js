@@ -26,11 +26,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			register: async (username, email, password) => {
+			register: async (userName, email, password) => {
 				const URLregister = `${apiUrl}/auth/register`;
 				const store = getStore();
 
-				if (!username || !email || !password) {
+				if (!userName || !email || !password) {
 					setStore({ ...store, message: "Todos los campos son obligatorios" })
 					return false
 				}
@@ -38,7 +38,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 
 					const userData = {
-						username: username,
+						username: userName,
 						email: email,
 						password: password
 					}
@@ -50,16 +50,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Content-type": "application/json; charset=UTF-8"
 						}
 					})
+					const data = await response.json()
 
 					if (!response.ok) {
-						throw new Error("Por favor intenta con un email diferente");
+						throw new Error(data.error);
+
 					}
 
-					const data = await response.json()
 					return true;
 
 				} catch (error) {
-					setStore({ ...store, message: error })
+					setStore({ ...store, message: error.message })
 					return false;
 				}
 			},
@@ -104,7 +105,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return true;
 
 				} catch (error) {
-					setStore({ ...store, message: error })
+					setStore({ ...store, message: error.message })
 					return false;
 				}
 			},
@@ -139,7 +140,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return true;
 
 				} catch (error) {
-					setStore({ ...store, message: error })
+					setStore({ ...store, message: error.message })
 					return false;
 				}
 			},

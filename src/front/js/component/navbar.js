@@ -5,7 +5,7 @@ export const Navbar = () => {
 	return (
 		<nav className="navbar navbar-expand-lg navbar-light bg-light ">
 			<div className="container-fluid">
-				<a className="navbar-brand" href="#">FedeTest</a>
+				<Link className="navbar-brand" to={'/'}>FedeTest</Link>
 				<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 					<span className="navbar-toggler-icon"></span>
 				</button>
@@ -15,14 +15,12 @@ export const Navbar = () => {
 							<a className="nav-link active" aria-current="page" href="/">Inicio</a>
 						</li>
 						<li className="nav-item">
-							<a className="nav-link" href="/auth/login">Login</a>
+							<Link to={'/auth/login'} className="nav-link">Login</Link>
 						</li>
 						<li className="nav-item">
-							<a className="nav-link" href="#">Pricing</a>
+							<Link to={'/auth/signup'} className="nav-link text-success">SignUp</Link>
 						</li>
-						<li className="nav-item">
-							<a className="nav-link disabled" href="#" tabIndex="-1" aria-disabled="true">Disabled</a>
-						</li>
+
 					</ul>
 				</div>
 			</div>
