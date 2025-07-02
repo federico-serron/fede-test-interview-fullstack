@@ -11,6 +11,7 @@ from api.utils import APIException, generate_sitemap
 from api.models import db
 from api.routes import api
 from auth.auth_bp import auth_bp
+from task.task_bp import task_bp
 from api.admin import setup_admin
 from api.commands import setup_commands
 from api.blacklist import BLACKLIST
@@ -60,6 +61,7 @@ setup_commands(app)
 # Add all endpoints form the API with a "api" prefix
 app.register_blueprint(api, url_prefix="/api")
 app.register_blueprint(auth_bp, url_prefix="/auth")
+app.register_blueprint(task_bp, url_prefix="/tasks")
 
 # Handle/serialize errors like a JSON object
 

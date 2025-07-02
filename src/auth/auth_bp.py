@@ -75,13 +75,18 @@ def login():
             return jsonify({"error": "User and/or password incorrect"}), 401
 
     except Exception as e:
-        return jsonify(str(e)), 500
+        return jsonify({"error": "Your request couldn't be completed"}), 500
     
     
 
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required()
 def logout():
-    jti = get_jwt()["jti"]
-    BLACKLIST.add(jti)
-    return jsonify({"msg": "Logeed out successfully"}), 200
+    
+    try:
+        jti = get_jwt()["jti"]
+        BLACKLIST.add(jti)
+        return jsonify({"msg": "Logeed out successfully"}), 200
+        
+    except Exception as e:
+        return jsonify({"error": "Your request couldn't be completed"}), 500
