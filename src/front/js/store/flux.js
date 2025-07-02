@@ -3,7 +3,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			message: null,
+			logged_user: {},
+			tasks: [],
 		},
+
 		actions: {
 			// Use getActions to call a function within a fuction
 			exampleFunction: () => {
@@ -55,6 +58,54 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 
 					const data = await response.json()
+					return true;
+
+				} catch (error) {
+					console.error("There was an error trying to sign you up:", error);
+					return false;
+				}
+			},
+
+			login: async (email, password) => {
+				const URLlogin = `${apiUrl}/auth/login`;
+				const store = getStore();
+
+				if (!email || !password) {
+					console.error("Missing required data")
+					return false
+				}
+
+				try {
+
+					const userData = {
+						email: email,
+						password: password
+					}
+
+					const response = await fetch(URLlogin, {
+						method: "POST",
+						body: JSON.stringify(userData),
+						headers: {
+							"Content-type": "application/json; charset=UTF-8"
+						}
+					})
+
+					if (!response.ok) {
+						console.error("Error trying to login, please try again later")
+						throw new Error(response.statusText);
+
+					}
+
+					const data = await response.json()
+
+					if (!data.token) {
+						console.error(data, "No valid token received!")
+						throw new Error("No token received");
+					}
+
+					localStorage.setItem("token", data.token)
+					setStore({ ...store, logged_user: data.user })
+
 					return true;
 
 				} catch (error) {
