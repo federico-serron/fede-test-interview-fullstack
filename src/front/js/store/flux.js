@@ -133,8 +133,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						throw new Error("Error trying to logout");
 					}
 
-					const data = await response.json()
-
 					localStorage.removeItem("token")
 					setStore({ ...store, logged_user: {} })
 
