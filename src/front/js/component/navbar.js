@@ -52,9 +52,14 @@ export const Navbar = () => {
 								</li>
 							</>
 						) : (
-							<li className="nav-item">
-								<div className="nav-link text-danger cursor-pointer border-0" role="button" onClick={handleLogout}>Log out</div>
-							</li>
+							<>
+								<li className="nav-item">
+									<Link to={'/dashboard'} className="nav-link text-success">Add Tasks</Link>
+								</li>
+								<li className="nav-item">
+									<div className="nav-link text-danger cursor-pointer border-0" role="button" onClick={handleLogout}>Log out</div>
+								</li>
+							</>
 						)}
 
 
