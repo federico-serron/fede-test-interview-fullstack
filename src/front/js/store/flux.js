@@ -31,7 +31,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const store = getStore();
 
 				if (!username || !email || !password) {
-					console.error("Missing required data")
+					setStore({ ...store, message: "Todos los campos son obligatorios" })
 					return false
 				}
 
@@ -52,16 +52,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 					})
 
 					if (!response.ok) {
-						console.error("Error trying to sign you up, please try again later")
-						throw new Error(response.statusText);
-
+						throw new Error("Por favor intenta con un email diferente");
 					}
 
 					const data = await response.json()
 					return true;
 
 				} catch (error) {
-					console.error("There was an error trying to sign you up:", error);
+					setStore({ ...store, message: error })
 					return false;
 				}
 			},
@@ -71,7 +69,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const store = getStore();
 
 				if (!email || !password) {
-					console.error("Missing required data")
+					setStore({ ...store, message: "Email y Password son necesarios" })
 					return false
 				}
 
@@ -91,16 +89,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 					})
 
 					if (!response.ok) {
-						console.error("Error trying to login, please try again later")
-						throw new Error(response.statusText);
-
+						throw new Error("Error al iniciar sesion");
 					}
 
 					const data = await response.json()
 
 					if (!data.token) {
-						console.error(data, "No valid token received!")
-						throw new Error("No token received");
+						throw new Error(data.error);
 					}
 
 					localStorage.setItem("token", data.token)
@@ -109,10 +104,49 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return true;
 
 				} catch (error) {
-					console.error("There was an error trying to sign you up:", error);
+					setStore({ ...store, message: error })
 					return false;
 				}
 			},
+
+			logout: async () => {
+				const URLlogout = `${apiUrl}/auth/login`;
+				const store = getStore();
+				const token = localStorage.getItem("token")
+
+				if (!token) {
+					setStore({ ...store, message: "You have to login first to be able to logout" })
+					return false
+				}
+
+				try {
+
+					const response = await fetch(URLlogout, {
+						method: "POST",
+						headers: {
+							"Authorization": `Bearer ${localStorage.getItem('token')}`,
+							"Content-type": "application/json; charset=UTF-8"
+						}
+					})
+
+					if (!response.ok) {
+						throw new Error("Error trying to logout");
+					}
+
+					const data = await response.json()
+
+					localStorage.removeItem("token")
+					setStore({ ...store, logged_user: {} })
+
+					return true;
+
+				} catch (error) {
+					setStore({ ...store, message: error })
+					return false;
+				}
+			},
+
+
 
 		}
 	};
