@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
 import TasksList from '../component/TasksList.jsx';
-import { toast } from 'react-toastify';
+import AddTask from '../component/AddTask.jsx';
 import { Context } from "../store/appContext";
 
 const Dashboard = () => {
@@ -21,6 +21,7 @@ const Dashboard = () => {
             <div className='row justify-content-center'>
                 <div className='col-lg-8 col-md-10'>
                     <TasksList />
+                    <AddTask />
                 </div>
             </div>
         </div>

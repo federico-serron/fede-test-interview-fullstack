@@ -174,7 +174,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						throw new Error(data.error);
 					}
 
-
 					setStore({ ...store, tasks: [...store.tasks, data.task] })
 
 					return true;
@@ -204,7 +203,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 						throw new Error(data.error);
 					}
 
-					setStore({ ...store, tasks: data.task })
+					if (data.tasks.length == 0) {
+						setStore({ ...store, message: "No tasks yet" })
+					}
+					setStore({ ...store, tasks: data.tasks })
 
 					return true;
 
@@ -218,7 +220,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const URLtask = `${apiUrl}/tasks/${task_id}`;
 				const store = getStore();
 
-				if (!task_id && !label || !completed) {
+				if (!task_id) {
 					setStore({ ...store, message: "Missing data" })
 					return false
 				}
@@ -245,9 +247,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 
 					setStore({
-						...store, tasks: store.tasks.map((t) => {
+						...store, tasks: store.tasks.map(t =>
 							t.id === task_id ? data.task : t
-						})
+						)
 					})
 
 					return true;
@@ -284,9 +286,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 
 					setStore({
-						...store, tasks: store.tasks.filter((t) => {
+						...store, tasks: store.tasks.filter(t =>
 							t.id !== task_id
-						})
+						)
 					})
 
 					return true;

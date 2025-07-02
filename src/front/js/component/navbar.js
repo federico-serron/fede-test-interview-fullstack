@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
+import { toast } from 'react-toastify';
+
 
 export const Navbar = () => {
 
@@ -51,7 +53,7 @@ export const Navbar = () => {
 							</>
 						) : (
 							<li className="nav-item">
-								<button className="nav-link text-danger cursor-pointer border-0" onClick={handleLogout}>Log out</button>
+								<div className="nav-link text-danger cursor-pointer border-0" role="button" onClick={handleLogout}>Log out</div>
 							</li>
 						)}
 
