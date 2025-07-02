@@ -1,14 +1,19 @@
-import React from 'react'
+import React, { useEffect, useState, useContext } from 'react'
+import { Navigate, Outlet, Link, useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
+import { Context } from "../store/appContext";
 
 const TasksList = () => {
+
+    const { store, actions } = useContext(Context);
+
     return (
         <table className="table table-striped table-hover">
             <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
+                    <th scope="col">Label</th>
+                    <th scope="col">Completed</th>
                 </tr>
             </thead>
             <tbody>
@@ -16,18 +21,6 @@ const TasksList = () => {
                     <th scope="row">1</th>
                     <td>Mark</td>
                     <td>Otto</td>
-                    <td>@mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td colspan="2">Larry the Bird</td>
-                    <td>@twitter</td>
                 </tr>
             </tbody>
         </table>
