@@ -1,7 +1,32 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Context } from "../store/appContext";
 
 export const Navbar = () => {
+
+	const { store, actions } = useContext(Context);
+
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+	const handleLogout = async () => {
+
+		const resp = await actions.logout()
+
+		if (resp) {
+			setIsLoggedIn(false)
+			toast.success("Logged out successfully")
+			navigate('/')
+
+		} else {
+			toast.error(store.message)
+			return
+		}
+	}
+
+	useEffect(() => {
+		setIsLoggedIn(!!localStorage.getItem("token"))
+	}, [])
+
 	return (
 		<nav className="navbar navbar-expand-lg navbar-light bg-light ">
 			<div className="container-fluid">
@@ -14,12 +39,21 @@ export const Navbar = () => {
 						<li className="nav-item">
 							<a className="nav-link active" aria-current="page" href="/">Inicio</a>
 						</li>
-						<li className="nav-item">
-							<Link to={'/auth/login'} className="nav-link">Login</Link>
-						</li>
-						<li className="nav-item">
-							<Link to={'/auth/signup'} className="nav-link text-success">SignUp</Link>
-						</li>
+						{!localStorage.getItem("token") ? (
+							<>
+								<li className="nav-item">
+									<Link to={'/auth/login'} className="nav-link">Login</Link>
+								</li>
+								<li className="nav-item">
+									<Link to={'/auth/signup'} className="nav-link text-success">SignUp</Link>
+								</li>
+							</>
+						) : (
+							<li className="nav-item">
+								<button className="nav-link text-danger cursor-pointer border-0" onClick={handleLogout}>Log out</button>
+							</li>
+						)}
+
 
 					</ul>
 				</div>

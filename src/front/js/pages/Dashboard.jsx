@@ -1,7 +1,21 @@
-import React from 'react'
+import React, { useEffect, useContext } from 'react'
+import { useNavigate } from 'react-router-dom';
 import TasksList from '../component/TasksList.jsx';
+import { toast } from 'react-toastify';
+import { Context } from "../store/appContext";
 
 const Dashboard = () => {
+
+    const navigate = useNavigate()
+
+
+    useEffect(() => {
+        if (!localStorage.getItem("token")) {
+            navigate("/auth/login")
+        }
+    }, []);
+
+
     return (
         <div className='container my-4'>
             <div className='row justify-content-center'>

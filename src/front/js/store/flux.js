@@ -111,7 +111,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			logout: async () => {
-				const URLlogout = `${apiUrl}/auth/login`;
+				const URLlogout = `${apiUrl}/auth/logout`;
 				const store = getStore();
 				const token = localStorage.getItem("token")
 
