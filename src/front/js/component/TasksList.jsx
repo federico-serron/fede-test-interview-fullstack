@@ -23,6 +23,11 @@ const TasksList = () => {
     };
 
     const handleEditSave = async (id) => {
+        if (editLabel.trim() == "") {
+            toast.error("You must write a task")
+            return;
+        }
+
         const resp = await actions.updateTask(id, editLabel, undefined);
         if (!resp) {
             toast.error(store.message);
@@ -43,20 +48,16 @@ const TasksList = () => {
     };
 
     useEffect(() => {
-        let isMounted = true;
 
         const fetchTasks = async () => {
             setLoading(true);
             const resp = await actions.getTasks();
-            if (resp && isMounted) setLoading(false);
+            if (resp) setLoading(false);
             else setLoading(false);
         };
 
         fetchTasks();
 
-        return () => {
-            isMounted = false;
-        };
     }, []);
 
     return (
