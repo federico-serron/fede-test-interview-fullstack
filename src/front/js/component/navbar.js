@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 export const Navbar = () => {
 
 	const { store, actions } = useContext(Context);
+	const navigate = useNavigate()
 
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -40,7 +41,7 @@ export const Navbar = () => {
 				<div className="collapse navbar-collapse" id="navbarNav">
 					<ul className="navbar-nav ms-auto">
 						<li className="nav-item">
-							<a className="nav-link active" aria-current="page" href="/">Inicio</a>
+							<a className="nav-link active" aria-current="page" href="/">Home</a>
 						</li>
 						{!localStorage.getItem("token") ? (
 							<>

@@ -225,6 +225,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false
 				}
 
+				if (label && label.trim() == "") {
+					setStore({ ...store, message: "Missing data" })
+					return false
+				}
+
 				try {
 
 					const editTaskData = {}
